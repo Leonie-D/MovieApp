@@ -1,8 +1,8 @@
 package com.leoniedusart.android.movieapp;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.databinding.DataBindingUtil;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -11,7 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
+import com.leoniedusart.android.movieapp.utils.DataKeys;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
 
         mLinearLayoutMovieList = (LinearLayout) findViewById(R.id.linear_layout_movie_list);
         int nbMovies = mLinearLayoutMovieList.getChildCount();
-        Log.d("leonieLog", String.valueOf(nbMovies));
         for(int i = 0; i < nbMovies; i++) {
             View movieCard = mLinearLayoutMovieList.getChildAt(i);
             if(movieCard instanceof LinearLayout) {
@@ -47,5 +46,8 @@ public class MainActivity extends AppCompatActivity {
     public void onClickMovieCard(View view)
     {
         Toast.makeText(this, ((TextView)view.findViewById(R.id.text_view_movie_title)).getText(), Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this, MovieActivity.class);
+        intent.putExtra(DataKeys.movieTitleKey, ((TextView)view.findViewById(R.id.text_view_movie_title)).getText());
+        startActivity(intent);
     }
 }

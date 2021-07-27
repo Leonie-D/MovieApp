@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Movie App</string>
+    <string name="hello">Hello %s</string>
+    <string name="search">Search</string>
+    <string name="sortie">"Release : "</string>
+    <string name="resume">"Sumary : "</string>
+    <string name="lorem">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris erat est, tempus ut nisl finibus, viverra pretium ante. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris erat est, tempus ut nisl finibus, viverra pretium ante.</string>
+    <string name="famous_movies">Famous movies</string>
+</resources>

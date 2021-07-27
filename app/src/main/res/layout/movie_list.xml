@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linear_layout_movie_list"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:showIn="@layout/activity_main">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/famous_movies"
+        android:textSize="@dimen/medium_text"/>
+
+    <include
+        android:id="@+id/movie_card_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/movie_card"
+        android:layout_marginVertical="@dimen/small_space" />
+
+    <include
+        android:id="@+id/movie_card_2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/movie_card"
+        android:layout_marginVertical="@dimen/small_space" />
+
+    <include
+        android:id="@+id/movie_card_3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/movie_card"
+        android:layout_marginVertical="@dimen/small_space" />
+
+    <include
+        android:id="@+id/movie_card_4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/movie_card"
+        android:layout_marginVertical="@dimen/small_space" />
+
+</LinearLayout>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Movie App</string>
+    <string name="hello">Bonjour %s</string>
+    <string name="search">Rechercher</string>
+    <string name="sortie">"Sortie : "</string>
+    <string name="resume">"Résumé : "</string>
+    <string name="famous_movies">Films populaires</string>
+    <string name="lorem">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris erat est, tempus ut nisl finibus, viverra pretium ante. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris erat est, tempus ut nisl finibus, viverra pretium ante.</string>
+</resources>

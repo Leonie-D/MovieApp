@@ -6,5 +6,14 @@
     <string name="sortie">"Sortie : "</string>
     <string name="resume">"Résumé : "</string>
     <string name="famous_movies">Films populaires</string>
-    <string name="lorem">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris erat est, tempus ut nisl finibus, viverra pretium ante. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris erat est, tempus ut nisl finibus, viverra pretium ante.</string>
+    <string name="lorem">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris erat est, tempus ut nisl finibus, viverra pretium ante. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris erat est, tempus ut nisl finibus, viverra pretium ante. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris erat est, tempus ut nisl finibus, viverra pretium ante. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris erat est, tempus ut nisl finibus, viverra pretium ante.</string>
+    <string name="action_settings">Paramètres</string>
+    <string name="title_activity_movie">Film en détails</string>
+    <string name="title_activity_search">Trouver un film</string>
+    <string name="about_movie">A propos de ce film</string>
+    <string name="read_more">Lire la suite</string>
+    <string name="read_less">Lire moins</string>
+    <string name="director">Director</string>
+    <string name="actors">Actors</string>
+    <string name="awards">Awards</string>
 </resources>

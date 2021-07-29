@@ -1,7 +1,9 @@
 package com.leoniedusart.android.movieapp;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -19,6 +21,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -48,6 +52,7 @@ public class MovieActivity extends AppCompatActivity {
     private CollapsingToolbarLayout toolBarLayout;
     private FloatingActionButton fab;
     private MovieActivity mContext;
+    private LinearLayout mLinearLayoutMovieDetails;
     private TextView mTextViewContent;
     private TextView mTextViewSummary;
     private TextView mTextViewDate;
@@ -56,6 +61,7 @@ public class MovieActivity extends AppCompatActivity {
     private TextView mTextViewAwards;
     private TextView mTextViewDirector;
     private ImageView mImageViewContent;
+    private ProgressBar mProgressBar;
     private Movie mMovie;
     private OkHttpClient mOkHttpClient;
 
@@ -79,6 +85,9 @@ public class MovieActivity extends AppCompatActivity {
                 ((FloatingActionButton)view).setImageResource(R.drawable.ic_baseline_favorite_24);
             }
         });
+
+        mProgressBar = findViewById(R.id.indeterminateBar);
+        mLinearLayoutMovieDetails = findViewById(R.id.linear_layout_movie_details);
 
         mTextViewSummary = findViewById(R.id.text_view_content_summary);
         mTextViewContent = findViewById(R.id.text_view_content_title);
@@ -118,6 +127,16 @@ public class MovieActivity extends AppCompatActivity {
                     }
                 }
             });
+        } else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+            builder.setTitle("Vous n'avez actuellement pas de connexion réseau");
+            builder.setPositiveButton("ok",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            finish();
+                        }
+                    });
+            builder.create().show();
         }
     }
 
@@ -131,6 +150,9 @@ public class MovieActivity extends AppCompatActivity {
         mTextViewCategories.setText(mMovie.getGenre());
         mTextViewActors.setText(mMovie.getActors());
         Picasso.get().load(mMovie.getPoster()).into(mImageViewContent);
+
+        mProgressBar.setVisibility(View.INVISIBLE);
+        mLinearLayoutMovieDetails.setVisibility(View.VISIBLE);
     }
 
     public void onClickReadMore(View view) {

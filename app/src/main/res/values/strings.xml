@@ -15,4 +15,6 @@
     <string name="director">Director</string>
     <string name="actors">Actors</string>
     <string name="awards">Awards</string>
+    <string name="no_internet">No available connexion</string>
+    <string name="ok">ok</string>
 </resources>

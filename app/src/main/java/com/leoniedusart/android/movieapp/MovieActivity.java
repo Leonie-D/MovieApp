@@ -82,7 +82,17 @@ public class MovieActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((FloatingActionButton)view).setImageResource(R.drawable.ic_baseline_favorite_24);
+                String tag = (String) view.getTag();
+                if (tag.equals("empty"))
+                {
+                    ((FloatingActionButton)view).setImageResource(R.drawable.ic_baseline_favorite_24);
+                    view.setTag("filled");
+                }
+                else
+                {
+                    ((FloatingActionButton)view).setImageResource(R.drawable.ic_baseline_favorite_border_24);
+                    view.setTag("empty");
+                }
             }
         });
 
@@ -129,8 +139,8 @@ public class MovieActivity extends AppCompatActivity {
             });
         } else {
             AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-            builder.setTitle("Vous n'avez actuellement pas de connexion réseau");
-            builder.setPositiveButton("ok",
+            builder.setTitle(R.string.no_internet);
+            builder.setPositiveButton(R.string.ok,
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             finish();

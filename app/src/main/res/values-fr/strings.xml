@@ -16,4 +16,6 @@
     <string name="director">Director</string>
     <string name="actors">Actors</string>
     <string name="awards">Awards</string>
+    <string name="no_internet">Vous n\'avez actuellement pas de connexion réseau</string>
+    <string name="ok">ok</string>
 </resources>

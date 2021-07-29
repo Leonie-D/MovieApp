@@ -19,4 +19,5 @@
     <string name="no_internet">Vous n\'avez actuellement pas de connexion réseau</string>
     <string name="ok">ok</string>
     <string name="pb">Un problème est survenu, essayer encore</string>
+    <string name="no_result">Aucun résultat</string>
 </resources>

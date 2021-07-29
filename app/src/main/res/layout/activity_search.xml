@@ -12,6 +12,7 @@
         android:layout_margin="@dimen/medium_space">
 
         <EditText
+            android:id="@+id/edit_text_search"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:inputType="text"
@@ -22,7 +23,8 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/search" />
+            android:text="@string/search"
+            android:onClick="onClickMovieSearch"/>
 
     </LinearLayout>
 

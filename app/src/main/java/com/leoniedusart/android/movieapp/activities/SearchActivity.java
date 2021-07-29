@@ -11,10 +11,15 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 import com.leoniedusart.android.movieapp.R;
 import com.leoniedusart.android.movieapp.adapters.SearchAdapter;
@@ -38,6 +43,7 @@ public class SearchActivity extends AppCompatActivity {
     private OkHttpClient mOkHttpClient;
     private RecyclerView mRecyclerViewMovieList;
     private SearchAdapter mAdapter;
+    private EditText mEditTextSearch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,12 +51,24 @@ public class SearchActivity extends AppCompatActivity {
         setContentView(R.layout.activity_search);
 
         mContext = this;
+        mEditTextSearch = findViewById(R.id.edit_text_search);
 
         mRecyclerViewMovieList = findViewById(R.id.recycler_view_movie_list);
         mRecyclerViewMovieList.setLayoutManager(new LinearLayoutManager(mContext));
         mAdapter = new SearchAdapter(mContext, mMovies);
         mRecyclerViewMovieList.setAdapter(mAdapter);
+    }
 
+    public void onClickMovieCard(View view)
+    {
+        Intent intent = new Intent(mContext, MovieActivity.class);
+        Log.d("LeonieTag", ((TextView)view.findViewById(R.id.text_view_movie_id)).getText().toString());
+        intent.putExtra(DataKeys.movieIdKey, ((TextView)view.findViewById(R.id.text_view_movie_id)).getText());
+        startActivity(intent);
+    }
+
+    public void onClickMovieSearch(View view)
+    {
         mOkHttpClient = new OkHttpClient();
         ConnectivityManager cm =
                 (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -58,7 +76,7 @@ public class SearchActivity extends AppCompatActivity {
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
         if(isConnected) {
-            Request request = new Request.Builder().url("http://omdbapi.com/?s=star%20wars&apikey=bf4e1adb&plot=full").build();
+            Request request = new Request.Builder().url(String.format("http://omdbapi.com/?s=%s&apikey=bf4e1adb&plot=full", mEditTextSearch.getText())).build();
             mOkHttpClient.newCall(request).enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
@@ -72,8 +90,14 @@ public class SearchActivity extends AppCompatActivity {
                             public void run() {
                                 // Code exécuté dans le Thread principale
                                 Gson gson = new Gson();
-                                mMovies.addAll(gson.fromJson(stringJson, MovieList.class).getSearch());
-                                mAdapter.notifyDataSetChanged();
+                                MovieList movieList = gson.fromJson(stringJson, MovieList.class);
+                                ArrayList<Movie> result = movieList.getSearch();
+                                if(result == null) {
+                                    Snackbar.make(view, movieList.getError(), Snackbar.LENGTH_LONG).show();
+                                } else {
+                                    mMovies.addAll(result);
+                                    mAdapter.notifyDataSetChanged();
+                                }
                             }
                         });
                     } else {
@@ -100,13 +124,5 @@ public class SearchActivity extends AppCompatActivity {
                     });
             builder.create().show();
         }
-    }
-
-    public void onClickMovieCard(View view)
-    {
-        Intent intent = new Intent(mContext, MovieActivity.class);
-        Log.d("LeonieTag", ((TextView)view.findViewById(R.id.text_view_movie_id)).getText().toString());
-        intent.putExtra(DataKeys.movieIdKey, ((TextView)view.findViewById(R.id.text_view_movie_id)).getText());
-        startActivity(intent);
     }
 }

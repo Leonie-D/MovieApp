@@ -16,14 +16,14 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
         <activity
-            android:name=".SearchActivity"
+            android:name=".activities.SearchActivity"
             android:label="@string/title_activity_search"
             android:theme="@style/Theme.MovieApp.NoActionBar"></activity>
         <activity
-            android:name=".MovieActivity"
+            android:name=".activities.MovieActivity"
             android:label="@string/title_activity_movie"
             android:theme="@style/Theme.MovieApp.NoActionBar" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -1,19 +1,15 @@
-package com.leoniedusart.android.movieapp;
+package com.leoniedusart.android.movieapp.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.leoniedusart.android.movieapp.R;
 import com.leoniedusart.android.movieapp.utils.DataKeys;
 
 public class MainActivity extends AppCompatActivity {

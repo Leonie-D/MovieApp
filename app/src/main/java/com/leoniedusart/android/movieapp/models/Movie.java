@@ -6,6 +6,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 public class Movie {
+    private String imdbID;
     @SerializedName(value = "title", alternate = {"Title"})
     private String title;
     @SerializedName(value = "released", alternate = {"Released"})
@@ -24,6 +25,10 @@ public class Movie {
     private String poster;
 
     public Movie(){};
+
+    public String getImdbID() {
+        return imdbID;
+    }
 
     public String getTitle() {
         return title;
@@ -55,6 +60,10 @@ public class Movie {
 
     public String getPoster() {
         return poster;
+    }
+
+    public void setImdbID(String imdbID) {
+        this.imdbID = imdbID;
     }
 
     public void setTitle(String title) {

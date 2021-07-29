@@ -1,28 +1,26 @@
 package com.leoniedusart.android.movieapp.activities;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-
-import com.google.android.material.appbar.CollapsingToolbarLayout;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.leoniedusart.android.movieapp.R;
-import com.leoniedusart.android.movieapp.databinding.ActivitySearchBinding;
+import com.leoniedusart.android.movieapp.adapters.SearchAdapter;
 import com.leoniedusart.android.movieapp.models.Movie;
 import com.leoniedusart.android.movieapp.models.MovieList;
+import com.leoniedusart.android.movieapp.utils.DataKeys;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,34 +33,23 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class SearchActivity extends AppCompatActivity {
-
-    private Toolbar toolbar;
-    private CollapsingToolbarLayout toolBarLayout;
-    private FloatingActionButton fab;
-    private SearchActivity mContext;
-    private ArrayList<Movie> mMovies;
+    private Context mContext;
+    private ArrayList<Movie> mMovies = new ArrayList<>();
     private OkHttpClient mOkHttpClient;
+    private RecyclerView mRecyclerViewMovieList;
+    private SearchAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        toolBarLayout = findViewById(R.id.toolbar_layout);
-        toolBarLayout.setTitle(getTitle());
-
         mContext = this;
 
-        fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        mRecyclerViewMovieList = findViewById(R.id.recycler_view_movie_list);
+        mRecyclerViewMovieList.setLayoutManager(new LinearLayoutManager(mContext));
+        mAdapter = new SearchAdapter(mContext, mMovies);
+        mRecyclerViewMovieList.setAdapter(mAdapter);
 
         mOkHttpClient = new OkHttpClient();
         ConnectivityManager cm =
@@ -80,15 +67,25 @@ public class SearchActivity extends AppCompatActivity {
                 public void onResponse(Call call, Response response) throws IOException {
                     if (response.isSuccessful()) {
                         final String stringJson = Objects.requireNonNull(response.body()).string();
-
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 // Code exécuté dans le Thread principale
                                 Gson gson = new Gson();
-                                mMovies = gson.fromJson(stringJson, MovieList.class).getSearch();
+                                mMovies.addAll(gson.fromJson(stringJson, MovieList.class).getSearch());
+                                mAdapter.notifyDataSetChanged();
                             }
                         });
+                    } else {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                        builder.setTitle(R.string.pb);
+                        builder.setPositiveButton(R.string.ok,
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        finish();
+                                    }
+                                });
+                        builder.create().show();
                     }
                 }
             });
@@ -103,5 +100,13 @@ public class SearchActivity extends AppCompatActivity {
                     });
             builder.create().show();
         }
+    }
+
+    public void onClickMovieCard(View view)
+    {
+        Intent intent = new Intent(mContext, MovieActivity.class);
+        Log.d("LeonieTag", ((TextView)view.findViewById(R.id.text_view_movie_id)).getText().toString());
+        intent.putExtra(DataKeys.movieIdKey, ((TextView)view.findViewById(R.id.text_view_movie_id)).getText());
+        startActivity(intent);
     }
 }

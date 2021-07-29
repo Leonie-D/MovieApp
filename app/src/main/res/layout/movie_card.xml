@@ -2,14 +2,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="200dp"
     android:orientation="horizontal"
     tools:showIn="@layout/movie_list"
     android:padding="@dimen/medium_space"
     android:background="@color/white"
     android:layout_marginVertical="@dimen/small_space"
     android:onClick="onClickMovieCard">
+
+        <TextView
+            android:id="@+id/text_view_movie_id"
+            android:layout_width="0dp"
+            android:layout_height="0dp"/>
 
         <ImageView
             android:id="@+id/image_view_movie"
@@ -32,6 +36,7 @@
                     android:layout_marginVertical="@dimen/medium_space" />
 
                 <LinearLayout
+                    android:tag="hide_on_search"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
                         <TextView
@@ -39,22 +44,23 @@
                             android:layout_height="wrap_content"
                             android:text="@string/sortie" />
                         <TextView
+                            android:id="@+id/text_view_movie_released"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="26 juillet 2021" />
+                            android:layout_height="wrap_content" />
                 </LinearLayout>
 
                 <TextView
+                    android:tag="hide_on_search"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/resume" />
                 <TextView
                     android:id="@+id/text_view_movie_summary"
+                    android:tag="hide_on_search"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:ellipsize="end"
-                    android:maxLines="4"
-                    android:text="@string/lorem" />
+                    android:maxLines="2" />
 
         </LinearLayout>
 

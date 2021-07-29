@@ -2,6 +2,7 @@ package com.leoniedusart.android.movieapp.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -17,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView mTextViewBonjour;
     private Button mButtonSearch;
     private LinearLayout mLinearLayoutMovieList;
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,11 +27,8 @@ public class MainActivity extends AppCompatActivity {
 
         mTextViewBonjour = (TextView) findViewById(R.id.text_view_bonjour);
         mTextViewBonjour.setText(getString(R.string.hello, "Léonie"));
-        //Toast.makeText(this, mTextViewBonjour.getText(), Toast.LENGTH_SHORT).show();
 
-        //mButtonSearch = (Button) findViewById(R.id.button_search);
-        //mButtonSearch.setOnClickListener(mouseEvent -> {
-        //});
+        mContext = this;
 
         mLinearLayoutMovieList = (LinearLayout) findViewById(R.id.linear_layout_movie_list);
         int nbMovies = mLinearLayoutMovieList.getChildCount();
@@ -44,16 +43,14 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClickStartSearch(View view)
     {
-        Intent intent = new Intent(this, SearchActivity.class);
+        Intent intent = new Intent(mContext, SearchActivity.class);
         startActivity(intent);
     }
 
     public void onClickMovieCard(View view)
     {
-        //Toast.makeText(this, ((TextView)view.findViewById(R.id.text_view_movie_title)).getText(), Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(this, MovieActivity.class);
-        intent.putExtra(DataKeys.movieTitleKey, ((TextView)view.findViewById(R.id.text_view_movie_title)).getText());
-        intent.putExtra(DataKeys.movieSummaryKey, ((TextView)view.findViewById(R.id.text_view_movie_summary)).getText());
+        Intent intent = new Intent(mContext, MovieActivity.class);
+        intent.putExtra(DataKeys.movieIdKey, ((TextView)view.findViewById(R.id.text_view_movie_id)).getText());
         startActivity(intent);
     }
 }

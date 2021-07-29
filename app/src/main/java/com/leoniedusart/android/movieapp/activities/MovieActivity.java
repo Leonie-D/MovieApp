@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -24,6 +25,7 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 import com.leoniedusart.android.movieapp.R;
 import com.leoniedusart.android.movieapp.models.Movie;
+import com.leoniedusart.android.movieapp.utils.DataKeys;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
@@ -40,8 +42,9 @@ public class MovieActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private CollapsingToolbarLayout toolBarLayout;
     private FloatingActionButton fab;
-    private MovieActivity mContext;
+    private Context mContext;
     private LinearLayout mLinearLayoutMovieDetails;
+    private TextView mTextViewId;
     private TextView mTextViewContent;
     private TextView mTextViewSummary;
     private TextView mTextViewDate;
@@ -61,6 +64,8 @@ public class MovieActivity extends AppCompatActivity {
         setContentView(R.layout.activity_movie);
 
         mContext = this;
+
+        final String movieId = getIntent().getExtras().getString(DataKeys.movieIdKey);
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -104,7 +109,7 @@ public class MovieActivity extends AppCompatActivity {
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
         if(isConnected) {
-            Request request = new Request.Builder().url("http://www.omdbapi.com/?i=tt0076759&apikey=bf4e1adb&plot=full").build();
+            Request request = new Request.Builder().url(String.format("http://www.omdbapi.com/?i=%s&apikey=bf4e1adb&plot=full", movieId)).build();
             mOkHttpClient.newCall(request).enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
@@ -113,16 +118,25 @@ public class MovieActivity extends AppCompatActivity {
                 public void onResponse(Call call, Response response) throws IOException {
                     if (response.isSuccessful()) {
                         final String stringJson = Objects.requireNonNull(response.body()).string();
-
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 // Code exécuté dans le Thread principale
                                 Gson gson = new Gson();
                                 mMovie = gson.fromJson(stringJson, Movie.class);
-                                mContext.updateUi();
+                                ((MovieActivity)mContext).updateUi();
                             }
                         });
+                    } else {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                        builder.setTitle(R.string.pb);
+                        builder.setPositiveButton(R.string.ok,
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        finish();
+                                    }
+                                });
+                        builder.create().show();
                     }
                 }
             });

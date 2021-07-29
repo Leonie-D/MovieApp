@@ -1,6 +1,9 @@
 package com.leoniedusart.android.movieapp;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 
 import com.google.android.material.appbar.CollapsingToolbarLayout;
@@ -30,12 +33,21 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Objects;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttp;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class MovieActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
     private CollapsingToolbarLayout toolBarLayout;
     private FloatingActionButton fab;
+    private MovieActivity mContext;
     private TextView mTextViewContent;
     private TextView mTextViewSummary;
     private TextView mTextViewDate;
@@ -44,13 +56,16 @@ public class MovieActivity extends AppCompatActivity {
     private TextView mTextViewAwards;
     private TextView mTextViewDirector;
     private ImageView mImageViewContent;
-    private Movie movie;
+    private Movie mMovie;
+    private OkHttpClient mOkHttpClient;
 
     @SuppressLint("UseCompatLoadingForDrawables")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie);
+
+        mContext = this;
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -61,35 +76,9 @@ public class MovieActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                ((FloatingActionButton)view).setImageResource(R.drawable.ic_baseline_favorite_24);
             }
         });
-
-        StringBuilder sb = new StringBuilder();
-        InputStream is = null;
-        try {
-            is = getAssets().open("movieData");
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            String str;
-            while ((str = br.readLine()) != null) {
-                sb.append(str);
-            }
-            br.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        String movieData = sb.toString();
-
-        Log.d("LeonieTag", movieData);
-        Gson gson = new Gson();
-        try {
-            movie = gson.fromJson(movieData, Movie.class);
-        } catch(Exception e) {
-            Log.d("LeonieTag", e.getMessage());
-        }
-
-        Log.d("LeonieTag", movie.getTitle());
 
         mTextViewSummary = findViewById(R.id.text_view_content_summary);
         mTextViewContent = findViewById(R.id.text_view_content_title);
@@ -100,19 +89,48 @@ public class MovieActivity extends AppCompatActivity {
         mTextViewDirector = findViewById(R.id.text_view_director);
         mImageViewContent = findViewById(R.id.image_view_content);
 
-        updateUi();
+        mOkHttpClient = new OkHttpClient();
+        ConnectivityManager cm =
+                (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+        if(isConnected) {
+            Request request = new Request.Builder().url("http://www.omdbapi.com/?i=tt0076759&apikey=bf4e1adb&plot=full").build();
+            mOkHttpClient.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                }
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    if (response.isSuccessful()) {
+                        final String stringJson = Objects.requireNonNull(response.body()).string();
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                // Code exécuté dans le Thread principale
+                                Gson gson = new Gson();
+                                mMovie = gson.fromJson(stringJson, Movie.class);
+                                mContext.updateUi();
+                            }
+                        });
+                    }
+                }
+            });
+        }
     }
 
     public void updateUi()
     {
-        mTextViewContent.setText(movie.getTitle());
-        mTextViewSummary.setText(movie.getPlot());
-        mTextViewDate.setText(movie.getReleased());
-        mTextViewDirector.setText(movie.getDirector());
-        mTextViewAwards.setText(movie.getAwards());
-        mTextViewCategories.setText(movie.getGenre());
-        mTextViewActors.setText(movie.getActors());
-        Picasso.get().load(movie.getPoster()).into(mImageViewContent);
+        mTextViewContent.setText(mMovie.getTitle());
+        mTextViewSummary.setText(mMovie.getPlot());
+        mTextViewDate.setText(mMovie.getReleased());
+        mTextViewDirector.setText(mMovie.getDirector());
+        mTextViewAwards.setText(mMovie.getAwards());
+        mTextViewCategories.setText(mMovie.getGenre());
+        mTextViewActors.setText(mMovie.getActors());
+        Picasso.get().load(mMovie.getPoster()).into(mImageViewContent);
     }
 
     public void onClickReadMore(View view) {

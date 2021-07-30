@@ -26,6 +26,7 @@ import com.leoniedusart.android.movieapp.adapters.SearchAdapter;
 import com.leoniedusart.android.movieapp.models.Movie;
 import com.leoniedusart.android.movieapp.models.MovieList;
 import com.leoniedusart.android.movieapp.utils.DataKeys;
+import com.leoniedusart.android.movieapp.utils.MovieAPI;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,10 +38,9 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class SearchActivity extends AppCompatActivity {
+public class SearchActivity extends AppCompatActivity implements MovieAPI {
     private Context mContext;
     private ArrayList<Movie> mMovies = new ArrayList<>();
-    private OkHttpClient mOkHttpClient;
     private RecyclerView mRecyclerViewMovieList;
     private SearchAdapter mAdapter;
     private EditText mEditTextSearch;
@@ -61,47 +61,7 @@ public class SearchActivity extends AppCompatActivity {
 
     public void onClickMovieSearch(View view)
     {
-        mOkHttpClient = new OkHttpClient();
-        ConnectivityManager cm =
-                (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-        if(isConnected) {
-            Request request = new Request.Builder().url(String.format("http://omdbapi.com/?s=%s&apikey=bf4e1adb&plot=full", mEditTextSearch.getText())).build();
-            mOkHttpClient.newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    alertUser(R.string.pb);
-                }
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    if (response.isSuccessful()) {
-                        final String stringJson = Objects.requireNonNull(response.body()).string();
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                // Code exécuté dans le Thread principale
-                                Gson gson = new Gson();
-                                MovieList movieList = gson.fromJson(stringJson, MovieList.class);
-                                ArrayList<Movie> result = movieList.getSearch();
-                                if(result == null) {
-                                    Snackbar.make(view, movieList.getError(), Snackbar.LENGTH_LONG).show();
-                                } else {
-                                    mMovies.removeAll(mMovies);
-                                    mMovies.addAll(result);
-                                    mAdapter.notifyDataSetChanged();
-                                }
-                            }
-                        });
-                    } else {
-                        alertUser(R.string.pb);
-                    }
-                }
-            });
-        } else {
-            alertUser(R.string.no_internet);
-        }
+        apiCall(mContext, String.format("http://omdbapi.com/?s=%s&apikey=bf4e1adb&plot=full", mEditTextSearch.getText()));
     }
 
     private void alertUser(int message) {
@@ -114,5 +74,19 @@ public class SearchActivity extends AppCompatActivity {
                     }
                 });
         builder.create().show();
+    }
+
+    @Override
+    public void onSuccess(String stringJson) {
+        Gson gson = new Gson();
+        MovieList movieList = gson.fromJson(stringJson, MovieList.class);
+        ArrayList<Movie> result = movieList.getSearch();
+        if(result == null) {
+            Snackbar.make(mRecyclerViewMovieList, movieList.getError(), Snackbar.LENGTH_LONG).show();
+        } else {
+            mMovies.removeAll(mMovies);
+            mMovies.addAll(result);
+            mAdapter.notifyDataSetChanged();
+        }
     }
 }

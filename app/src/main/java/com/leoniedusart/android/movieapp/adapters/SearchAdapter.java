@@ -25,6 +25,7 @@ import com.leoniedusart.android.movieapp.activities.MovieActivity;
 import com.leoniedusart.android.movieapp.models.Movie;
 import com.leoniedusart.android.movieapp.utils.DataKeys;
 import com.leoniedusart.android.movieapp.utils.Helper;
+import com.leoniedusart.android.movieapp.utils.MovieAPI;
 import com.squareup.picasso.Picasso;
 
 import org.jetbrains.annotations.NotNull;
@@ -76,7 +77,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
     }
 
     // Classe holder qui contient la vue d’un item
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener, MovieAPI {
         // éléments d'un item de liste
         public TextView mTextViewMovieTitle;
         public ImageView mImageViewMoviePoster;
@@ -87,7 +88,6 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
 
         public ViewHolder(View view) {
             super(view);
-            SharedPreferences sharedPref = mContext.getSharedPreferences("Leonie_test", Context.MODE_PRIVATE);
 
             mTextViewMovieTitle = view.findViewById(R.id.text_view_movie_title);
             mImageViewMoviePoster = view.findViewById(R.id.image_view_movie);
@@ -101,54 +101,14 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
                 @Override
                 public void onClick(View view) {
                     String tag = (String) view.getTag();
-                    SharedPreferences.Editor editor = sharedPref.edit();
                     if (tag.equals("empty"))
                     {
-                        OkHttpClient mOkHttpClient = new OkHttpClient();
-                        ConnectivityManager cm =
-                                (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-
-                        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-                        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-                        if(isConnected) {
-                            Request request = new Request.Builder().url(String.format("http://www.omdbapi.com/?i=%s&apikey=bf4e1adb&plot=full", mTextViewMovieId.getText().toString())).build();
-                            mOkHttpClient.newCall(request).enqueue(new Callback() {
-                                @Override
-                                public void onFailure(Call call, IOException e) {
-                                }
-                                @Override
-                                public void onResponse(Call call, Response response) throws IOException {
-                                    if (response.isSuccessful()) {
-                                        final String stringJson = Objects.requireNonNull(response.body()).string();
-                                        ((FloatingActionButton)view).setImageResource(R.drawable.ic_baseline_favorite_24);
-                                        view.setTag("filled");
-                                        editor.putString(mTextViewMovieId.getText().toString(), stringJson);
-                                        editor.apply();
-                                    } else {
-                                        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                                        builder.setTitle(R.string.pb);
-                                        builder.setPositiveButton(R.string.ok,
-                                                new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int id) {
-                                                    }
-                                                });
-                                        builder.create().show();
-                                    }
-                                }
-                            });
-                        } else {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                            builder.setTitle(R.string.no_internet);
-                            builder.setPositiveButton(R.string.ok,
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-                                        }
-                                    });
-                            builder.create().show();
-                        }
+                       apiCall(mContext, String.format("http://www.omdbapi.com/?i=%s&apikey=bf4e1adb&plot=full", mTextViewMovieId.getText().toString()));
                     }
                     else
                     {
+                        SharedPreferences sharedPref = mContext.getSharedPreferences("Leonie_test", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPref.edit();
                         ((FloatingActionButton)view).setImageResource(R.drawable.ic_baseline_favorite_border_24);
                         view.setTag("empty");
                         editor.remove(mTextViewMovieId.getText().toString());
@@ -177,6 +137,16 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
             Intent intent = new Intent(mContext, MovieActivity.class);
             intent.putExtra(DataKeys.movieIdKey, mTextViewMovieId.getText());
             mContext.startActivity(intent);
+        }
+
+        @Override
+        public void onSuccess(String stringJson) {
+            SharedPreferences sharedPref = mContext.getSharedPreferences("Leonie_test", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            mFavoriteButton.setImageResource(R.drawable.ic_baseline_favorite_24);
+            mFavoriteButton.setTag("filled");
+            editor.putString(mTextViewMovieId.getText().toString(), stringJson);
+            editor.apply();
         }
     }
 }

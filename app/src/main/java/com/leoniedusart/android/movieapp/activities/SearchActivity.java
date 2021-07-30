@@ -80,7 +80,6 @@ public class SearchActivity extends AppCompatActivity implements MovieAPI {
                     // Le nombre de résultat est supérieur à 0
                     // Dans ce cas on télécharge les résultats suivants
                     mPageNumber++;
-                    Log.d("LeonieTag", String.format("http://omdbapi.com/?s=%s&apikey=bf4e1adb&plot=full&page=%d", mEditTextSearch.getText(), mPageNumber));
                     apiCall(mContext, String.format("http://omdbapi.com/?s=%s&apikey=bf4e1adb&plot=full&page=%d", mEditTextSearch.getText(), mPageNumber), false);
                     mIsLoading = true;
                 }
@@ -122,14 +121,27 @@ public class SearchActivity extends AppCompatActivity implements MovieAPI {
             Snackbar.make(mRecyclerViewMovieList, movieList.getError(), Snackbar.LENGTH_LONG).show();
         } else {
             mNbPages = (Integer.parseInt(movieList.getTotalResults()) / 10) + 1;
+            Log.d("LeonieTag", String.valueOf(mMovies.size()));
             if(clear) {
                 mMovies.removeAll(mMovies);
                 mJsonMovies.removeAll(mJsonMovies);
+            } else if (mNbPages > 1) {
+                mMovies.remove(mMovies.size()-1);
             }
+            Log.d("LeonieTag", String.valueOf(mMovies.size()));
             for(int i = 0; i < result.size(); i++) {
                 mJsonMovies.add(gson.toJson(result.get(i)));
             }
             mMovies.addAll(result);
+            Log.d("LeonieTag", String.valueOf(mMovies.size()));
+
+            // ajout du loader s'il reste des pages à appeler
+            if(mPageNumber < mNbPages) {
+                mMovies.add(null);
+            }
+
+            Log.d("LeonieTag", String.valueOf(mMovies.size()));
+
             mIsLoading = false;
             mAdapter.notifyDataSetChanged();
         }

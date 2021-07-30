@@ -13,6 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -61,11 +63,18 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull @NotNull ViewHolder holder, int position) {
         Movie movie = mMovies.get(position);
-        holder.mTextViewMovieId.setText(movie.getImdbID());
-        holder.mTextViewMovieTitle.setText(movie.getTitle());
-        Picasso.get().load(movie.getPoster()).into(holder.mImageViewMoviePoster);
-        for (int i = 0; i < holder.mViewsToHide.size(); i++) {
-            holder.mViewsToHide.get(i).setVisibility(View.INVISIBLE);
+        if(movie != null) {
+            holder.mLoader.setVisibility(View.INVISIBLE);
+            holder.mRelativeLayoutMovieCard.setVisibility(View.VISIBLE);
+            holder.mTextViewMovieId.setText(movie.getImdbID());
+            holder.mTextViewMovieTitle.setText(movie.getTitle());
+            Picasso.get().load(movie.getPoster()).into(holder.mImageViewMoviePoster);
+            for (int i = 0; i < holder.mViewsToHide.size(); i++) {
+                holder.mViewsToHide.get(i).setVisibility(View.INVISIBLE);
+            }
+        } else {
+            holder.mRelativeLayoutMovieCard.setVisibility(View.INVISIBLE);
+            holder.mLoader.setVisibility(View.VISIBLE);
         }
     }
 
@@ -83,10 +92,14 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         public TextView mTextViewMovieId;
         public boolean isFavoriteMovie;
         public FloatingActionButton mFavoriteButton;
+        public RelativeLayout mRelativeLayoutMovieCard;
+        public ProgressBar mLoader;
 
         public ViewHolder(View view) {
             super(view);
 
+            mRelativeLayoutMovieCard = view.findViewById(R.id.relative_layout_movie_card);
+            mLoader = view.findViewById(R.id.indeterminateBar);
             mTextViewMovieTitle = view.findViewById(R.id.text_view_movie_title);
             mImageViewMoviePoster = view.findViewById(R.id.image_view_movie);
             mViewsToHide = Helper.getViewsByTag((ViewGroup) view, "hide_on_search");

@@ -59,13 +59,6 @@ public class SearchActivity extends AppCompatActivity {
         mRecyclerViewMovieList.setAdapter(mAdapter);
     }
 
-    public void onClickMovieCard(View view)
-    {
-        Intent intent = new Intent(mContext, MovieActivity.class);
-        intent.putExtra(DataKeys.movieIdKey, ((TextView)view.findViewById(R.id.text_view_movie_id)).getText());
-        startActivity(intent);
-    }
-
     public void onClickMovieSearch(View view)
     {
         mOkHttpClient = new OkHttpClient();

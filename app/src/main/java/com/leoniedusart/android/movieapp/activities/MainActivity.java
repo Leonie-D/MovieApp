@@ -63,13 +63,6 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void onClickMovieCard(View view)
-    {
-        Intent intent = new Intent(mContext, MovieActivity.class);
-        intent.putExtra(DataKeys.movieIdKey, ((TextView)view.findViewById(R.id.text_view_movie_id)).getText());
-        startActivity(intent);
-    }
-
     public void updateUi() {
         mMovies.removeAll(mMovies);
         SharedPreferences sharedPref = getSharedPreferences("Leonie_test", Context.MODE_PRIVATE);

@@ -71,10 +71,6 @@ public class MovieActivity extends AppCompatActivity {
 
         final String movieId = getIntent().getExtras().getString(DataKeys.movieIdKey);
         isFavoriteMovie = sharedPref.contains(movieId);
-        if(isFavoriteMovie) {
-            fab.setImageResource(R.drawable.ic_baseline_favorite_24);
-            fab.setTag("filled");
-        }
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -82,6 +78,10 @@ public class MovieActivity extends AppCompatActivity {
         toolBarLayout.setTitle(getTitle());
 
         fab = findViewById(R.id.fab);
+        if(isFavoriteMovie) {
+            fab.setImageResource(R.drawable.ic_baseline_favorite_24);
+            fab.setTag("filled");
+        }
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

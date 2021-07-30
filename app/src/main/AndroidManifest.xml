@@ -15,7 +15,7 @@
         android:theme="@style/Theme.MovieApp"
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
-        <activity android:name=".activities.SearchActivity"></activity>
+        <activity android:name=".activities.SearchActivity" />
         <activity
             android:name=".activities.MovieActivity"
             android:label="@string/title_activity_movie"

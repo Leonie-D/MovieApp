@@ -62,7 +62,6 @@ public class SearchActivity extends AppCompatActivity {
     public void onClickMovieCard(View view)
     {
         Intent intent = new Intent(mContext, MovieActivity.class);
-        Log.d("LeonieTag", ((TextView)view.findViewById(R.id.text_view_movie_id)).getText().toString());
         intent.putExtra(DataKeys.movieIdKey, ((TextView)view.findViewById(R.id.text_view_movie_id)).getText());
         startActivity(intent);
     }
@@ -80,6 +79,7 @@ public class SearchActivity extends AppCompatActivity {
             mOkHttpClient.newCall(request).enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
+                    alertUser(R.string.pb);
                 }
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
@@ -95,34 +95,31 @@ public class SearchActivity extends AppCompatActivity {
                                 if(result == null) {
                                     Snackbar.make(view, movieList.getError(), Snackbar.LENGTH_LONG).show();
                                 } else {
+                                    mMovies.removeAll(mMovies);
                                     mMovies.addAll(result);
                                     mAdapter.notifyDataSetChanged();
                                 }
                             }
                         });
                     } else {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                        builder.setTitle(R.string.pb);
-                        builder.setPositiveButton(R.string.ok,
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        finish();
-                                    }
-                                });
-                        builder.create().show();
+                        alertUser(R.string.pb);
                     }
                 }
             });
         } else {
-            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-            builder.setTitle(R.string.no_internet);
-            builder.setPositiveButton(R.string.ok,
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            finish();
-                        }
-                    });
-            builder.create().show();
+            alertUser(R.string.no_internet);
         }
+    }
+
+    private void alertUser(int message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        builder.setTitle(message);
+        builder.setPositiveButton(R.string.ok,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        finish();
+                    }
+                });
+        builder.create().show();
     }
 }

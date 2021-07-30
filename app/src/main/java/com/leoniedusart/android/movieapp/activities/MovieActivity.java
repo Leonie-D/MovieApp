@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -29,6 +30,7 @@ import com.leoniedusart.android.movieapp.utils.DataKeys;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Objects;
 
 import okhttp3.Call;
@@ -43,8 +45,8 @@ public class MovieActivity extends AppCompatActivity {
     private CollapsingToolbarLayout toolBarLayout;
     private FloatingActionButton fab;
     private Context mContext;
+    private boolean isFavoriteMovie;
     private LinearLayout mLinearLayoutMovieDetails;
-    private TextView mTextViewId;
     private TextView mTextViewContent;
     private TextView mTextViewSummary;
     private TextView mTextViewDate;
@@ -54,6 +56,7 @@ public class MovieActivity extends AppCompatActivity {
     private TextView mTextViewDirector;
     private ImageView mImageViewContent;
     private ProgressBar mProgressBar;
+    private String mJsonMovie;
     private Movie mMovie;
     private OkHttpClient mOkHttpClient;
 
@@ -64,8 +67,10 @@ public class MovieActivity extends AppCompatActivity {
         setContentView(R.layout.activity_movie);
 
         mContext = this;
+        SharedPreferences sharedPref = getSharedPreferences("Leonie_test", Context.MODE_PRIVATE);
 
         final String movieId = getIntent().getExtras().getString(DataKeys.movieIdKey);
+        isFavoriteMovie = sharedPref.contains(movieId);
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -77,15 +82,20 @@ public class MovieActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String tag = (String) view.getTag();
+                SharedPreferences.Editor editor = sharedPref.edit();
                 if (tag.equals("empty"))
                 {
                     ((FloatingActionButton)view).setImageResource(R.drawable.ic_baseline_favorite_24);
                     view.setTag("filled");
+                    editor.putString(movieId, mJsonMovie);
+                    editor.apply();
                 }
                 else
                 {
                     ((FloatingActionButton)view).setImageResource(R.drawable.ic_baseline_favorite_border_24);
                     view.setTag("empty");
+                    editor.remove(movieId);
+                    editor.apply();
                 }
             }
         });
@@ -123,6 +133,7 @@ public class MovieActivity extends AppCompatActivity {
                             public void run() {
                                 // Code exécuté dans le Thread principale
                                 Gson gson = new Gson();
+                                mJsonMovie = stringJson;
                                 mMovie = gson.fromJson(stringJson, Movie.class);
                                 ((MovieActivity)mContext).updateUi();
                             }
@@ -166,6 +177,11 @@ public class MovieActivity extends AppCompatActivity {
 
         mProgressBar.setVisibility(View.INVISIBLE);
         mLinearLayoutMovieDetails.setVisibility(View.VISIBLE);
+
+        if(isFavoriteMovie) {
+            fab.setImageResource(R.drawable.ic_baseline_favorite_24);
+            fab.setTag("filled");
+        }
     }
 
     public void onClickReadMore(View view) {

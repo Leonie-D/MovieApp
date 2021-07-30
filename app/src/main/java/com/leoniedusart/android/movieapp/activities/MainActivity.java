@@ -1,24 +1,37 @@
 package com.leoniedusart.android.movieapp.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
 import com.leoniedusart.android.movieapp.R;
+import com.leoniedusart.android.movieapp.adapters.FavoriteAdapter;
+import com.leoniedusart.android.movieapp.adapters.SearchAdapter;
+import com.leoniedusart.android.movieapp.models.Movie;
 import com.leoniedusart.android.movieapp.utils.DataKeys;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
     private TextView mTextViewBonjour;
-    private Button mButtonSearch;
-    private LinearLayout mLinearLayoutMovieList;
     private Context mContext;
+    private ArrayList<Movie> mMovies = new ArrayList<>();
+    private RecyclerView mRecyclerViewFavoriteMovieList;
+    private FavoriteAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,15 +43,18 @@ public class MainActivity extends AppCompatActivity {
 
         mContext = this;
 
-        mLinearLayoutMovieList = (LinearLayout) findViewById(R.id.linear_layout_movie_list);
-        int nbMovies = mLinearLayoutMovieList.getChildCount();
-        for(int i = 0; i < nbMovies; i++) {
-            View movieCard = mLinearLayoutMovieList.getChildAt(i);
-            if(movieCard instanceof LinearLayout) {
-                movieCard.findViewById(R.id.text_view_movie_title);
-                ((TextView) movieCard.findViewById(R.id.text_view_movie_title)).setText(String.format("Titre du film %d", i));
-            }
-        }
+        mRecyclerViewFavoriteMovieList = findViewById(R.id.recycler_view_movie_list);
+        mRecyclerViewFavoriteMovieList.setLayoutManager(new LinearLayoutManager(mContext));
+        mAdapter = new FavoriteAdapter(mContext, mMovies);
+        mRecyclerViewFavoriteMovieList.setAdapter(mAdapter);
+
+        updateUi();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        updateUi();
     }
 
     public void onClickStartSearch(View view)
@@ -52,5 +68,17 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(mContext, MovieActivity.class);
         intent.putExtra(DataKeys.movieIdKey, ((TextView)view.findViewById(R.id.text_view_movie_id)).getText());
         startActivity(intent);
+    }
+
+    public void updateUi() {
+        mMovies.removeAll(mMovies);
+        SharedPreferences sharedPref = getSharedPreferences("Leonie_test", Context.MODE_PRIVATE);
+        Map<String, ?> allEntries = sharedPref.getAll();
+        for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
+            Gson gson = new Gson();
+            Movie movie = gson.fromJson(entry.getValue().toString(), Movie.class);
+            mMovies.add(movie);
+        }
+        mAdapter.notifyDataSetChanged();
     }
 }

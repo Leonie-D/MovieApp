@@ -16,13 +16,12 @@
         android:textSize="@dimen/title_text"
         android:textColor="@color/teal_700" />
 
-    <include
-        layout="@layout/movie_list"
-        android:layout_height="wrap_content"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view_movie_list"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@id/text_view_bonjour"
-        android:layout_marginTop="@dimen/large_space"
-        android:layout_marginBottom="@dimen/medium_space"/>
+        />
 
     <Button
         android:id="@+id/button_search"

@@ -42,6 +42,7 @@ import okhttp3.Response;
 public class SearchActivity extends AppCompatActivity implements MovieAPI {
     private Context mContext;
     private ArrayList<Movie> mMovies = new ArrayList<>();
+    private ArrayList<String> mJsonMovies = new ArrayList<>();
     private RecyclerView mRecyclerViewMovieList;
     private SearchAdapter mAdapter;
     private EditText mEditTextSearch;
@@ -71,6 +72,7 @@ public class SearchActivity extends AppCompatActivity implements MovieAPI {
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+
                 if (!mIsLoading && linearLayoutManager != null && linearLayoutManager.findLastVisibleItemPosition() == mMovies.size() - 1 && mPageNumber < mNbPages && mMovies.size() != 0) {
                     // Il n'est pas dejà entrain de charger les suivants
                     // Il affiche le dernier élément
@@ -84,6 +86,26 @@ public class SearchActivity extends AppCompatActivity implements MovieAPI {
                 }
             }
         });
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putStringArrayList("movies", mJsonMovies);
+        savedInstanceState.putInt("nbPages", mNbPages);
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mJsonMovies = savedInstanceState.getStringArrayList("movies");
+        mNbPages = savedInstanceState.getInt("nbPages");
+        for(int i = 0; i < mJsonMovies.size(); i++) {
+            Gson gson = new Gson();
+            mMovies.add(gson.fromJson(mJsonMovies.get(i), Movie.class));
+        }
+        mAdapter.notifyDataSetChanged();
+        mIsLoading = false;
     }
 
     public void onClickMovieSearch(View view)
@@ -102,6 +124,10 @@ public class SearchActivity extends AppCompatActivity implements MovieAPI {
             mNbPages = (Integer.parseInt(movieList.getTotalResults()) / 10) + 1;
             if(clear) {
                 mMovies.removeAll(mMovies);
+                mJsonMovies.removeAll(mJsonMovies);
+            }
+            for(int i = 0; i < result.size(); i++) {
+                mJsonMovies.add(gson.toJson(result.get(i)));
             }
             mMovies.addAll(result);
             mIsLoading = false;

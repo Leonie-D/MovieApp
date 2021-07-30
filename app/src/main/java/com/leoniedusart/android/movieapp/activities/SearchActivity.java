@@ -1,5 +1,6 @@
 package com.leoniedusart.android.movieapp.activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -44,6 +45,9 @@ public class SearchActivity extends AppCompatActivity implements MovieAPI {
     private RecyclerView mRecyclerViewMovieList;
     private SearchAdapter mAdapter;
     private EditText mEditTextSearch;
+    private int mPageNumber = 1;
+    private int mNbPages = 0;
+    private boolean mIsLoading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,35 +61,50 @@ public class SearchActivity extends AppCompatActivity implements MovieAPI {
         mRecyclerViewMovieList.setLayoutManager(new LinearLayoutManager(mContext));
         mAdapter = new SearchAdapter(mContext, mMovies);
         mRecyclerViewMovieList.setAdapter(mAdapter);
+
+        mRecyclerViewMovieList.addOnScrollListener(new RecyclerView.OnScrollListener(){
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                if (!mIsLoading && linearLayoutManager != null && linearLayoutManager.findLastVisibleItemPosition() == mMovies.size() - 1 && mPageNumber < mNbPages && mMovies.size() != 0) {
+                    // Il n'est pas dejà entrain de charger les suivants
+                    // Il affiche le dernier élément
+                    // Le nombre de page est supérieur à 0
+                    // Le nombre de résultat est supérieur à 0
+                    // Dans ce cas on télécharge les résultats suivants
+                    mPageNumber++;
+                    Log.d("LeonieTag", String.format("http://omdbapi.com/?s=%s&apikey=bf4e1adb&plot=full&page=%d", mEditTextSearch.getText(), mPageNumber));
+                    apiCall(mContext, String.format("http://omdbapi.com/?s=%s&apikey=bf4e1adb&plot=full&page=%d", mEditTextSearch.getText(), mPageNumber), false);
+                    mIsLoading = true;
+                }
+            }
+        });
     }
 
     public void onClickMovieSearch(View view)
     {
-        apiCall(mContext, String.format("http://omdbapi.com/?s=%s&apikey=bf4e1adb&plot=full", mEditTextSearch.getText()));
-    }
-
-    private void alertUser(int message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-        builder.setTitle(message);
-        builder.setPositiveButton(R.string.ok,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        finish();
-                    }
-                });
-        builder.create().show();
+        apiCall(mContext, String.format("http://omdbapi.com/?s=%s&apikey=bf4e1adb&plot=full&page=%d", mEditTextSearch.getText(), mPageNumber), true);
     }
 
     @Override
-    public void onSuccess(String stringJson) {
+    public void onSuccess(String stringJson, boolean clear) {
         Gson gson = new Gson();
         MovieList movieList = gson.fromJson(stringJson, MovieList.class);
         ArrayList<Movie> result = movieList.getSearch();
         if(result == null) {
             Snackbar.make(mRecyclerViewMovieList, movieList.getError(), Snackbar.LENGTH_LONG).show();
         } else {
-            mMovies.removeAll(mMovies);
+            mNbPages = (Integer.parseInt(movieList.getTotalResults()) / 10) + 1;
+            if(clear) {
+                mMovies.removeAll(mMovies);
+            }
             mMovies.addAll(result);
+            mIsLoading = false;
             mAdapter.notifyDataSetChanged();
         }
     }

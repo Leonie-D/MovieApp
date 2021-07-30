@@ -55,13 +55,11 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
     @Override
     public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(mContext).inflate(R.layout.movie_card, parent, false);
-        Log.d("LeonieTag", "onCreateViewHolder");
         return new ViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(@NonNull @NotNull ViewHolder holder, int position) {
-        Log.d("LeonieTag", String.format("onBindViewHolder : %d", position));
         Movie movie = mMovies.get(position);
         holder.mTextViewMovieId.setText(movie.getImdbID());
         holder.mTextViewMovieTitle.setText(movie.getTitle());
@@ -103,7 +101,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
                     String tag = (String) view.getTag();
                     if (tag.equals("empty"))
                     {
-                       apiCall(mContext, String.format("http://www.omdbapi.com/?i=%s&apikey=bf4e1adb&plot=full", mTextViewMovieId.getText().toString()));
+                       apiCall(mContext, String.format("http://www.omdbapi.com/?i=%s&apikey=bf4e1adb&plot=full", mTextViewMovieId.getText().toString()), false);
                     }
                     else
                     {
@@ -140,7 +138,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         }
 
         @Override
-        public void onSuccess(String stringJson) {
+        public void onSuccess(String stringJson, boolean clear) {
             SharedPreferences sharedPref = mContext.getSharedPreferences("Leonie_test", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();
             mFavoriteButton.setImageResource(R.drawable.ic_baseline_favorite_24);

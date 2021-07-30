@@ -116,7 +116,7 @@ public class MovieActivity extends AppCompatActivity implements MovieAPI {
         mTextViewDirector = findViewById(R.id.text_view_director);
         mImageViewContent = findViewById(R.id.image_view_content);
 
-        apiCall(mContext, String.format("http://www.omdbapi.com/?i=%s&apikey=bf4e1adb&plot=full", movieId));
+        apiCall(mContext, String.format("http://www.omdbapi.com/?i=%s&apikey=bf4e1adb&plot=full", movieId), false);
     }
 
     public void updateUi()
@@ -151,7 +151,7 @@ public class MovieActivity extends AppCompatActivity implements MovieAPI {
     }
 
     @Override
-    public void onSuccess(String stringJson) {
+    public void onSuccess(String stringJson, boolean clear) {
         Gson gson = new Gson();
         mJsonMovie = stringJson;
         mMovie = gson.fromJson(stringJson, Movie.class);

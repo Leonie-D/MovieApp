@@ -27,7 +27,7 @@ import okhttp3.Response;
 public interface MovieAPI {
     OkHttpClient mOkHttpClient = new OkHttpClient();
 
-    default void apiCall(Context context, String url) {
+    default void apiCall(Context context, String url, boolean clear) {
         ConnectivityManager cm =
                 (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -47,7 +47,7 @@ public interface MovieAPI {
                         ((Activity)context).runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                onSuccess(stringJson);
+                                onSuccess(stringJson, clear);
                             }
                         });
                     } else {
@@ -72,5 +72,5 @@ public interface MovieAPI {
         builder.create().show();
     }
 
-    void onSuccess(String stringJson);
+    void onSuccess(String stringJson, boolean clear);
 }

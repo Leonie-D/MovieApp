@@ -4,10 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="200dp"
     android:orientation="horizontal"
-    tools:showIn="@layout/movie_list"
     android:padding="@dimen/medium_space"
     android:background="@color/white"
-    android:layout_marginVertical="@dimen/small_space"
+    android:layout_margin="@dimen/small_space"
     android:onClick="onClickMovieCard">
 
         <TextView
@@ -18,13 +17,14 @@
         <ImageView
             android:id="@+id/image_view_movie"
             android:layout_width="120dp"
-            android:layout_height="160dp"
-            android:src="@drawable/movie2" />
+            android:layout_height="160dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingLeft="@dimen/small_space"
+            android:paddingStart="@dimen/small_space">
 
                 <TextView
                     android:id="@+id/text_view_movie_title"
